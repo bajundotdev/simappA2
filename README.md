@@ -1,103 +1,84 @@
 # Startup Incubation Management App
 
-A **comprehensive full-stack web application** designed to streamline and manage **startup incubation programs**. This platform provides an end-to-end solution for **application management, mentor assignment, progress tracking, feedback collection, and event scheduling**.
+![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=nodedotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)
+![Auth](https://img.shields.io/badge/auth-JWT%20%2B%20roles-blue)
+![Tests](https://img.shields.io/badge/tests-Mocha%20%2B%20Chai-8D6748?logo=mocha&logoColor=white)
+![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
+![Last commit](https://img.shields.io/github/last-commit/bajundotdev/simappA2)
 
-Built using **Node.js**, **React**, and **MongoDB**, with modern DevOps practices for seamless deployment.
+> A web app that runs a startup incubation program from end to end: startups
+> apply, administrators review and assign mentors, mentors book sessions and
+> give feedback, and everyone can see progress.
 
-## Live Demo
+## In plain terms
 
-- **Public URL:** [http://3.106.56.194](http://3.106.56.194)
-- **Demo Credentials:**
-  - Username: `admin@admin.com`
-  - Password: `batingal`
+**The problem.** An incubator (an organisation that helps new businesses get
+started) usually tracks applications, mentor pairings, meetings and progress
+across emails and spreadsheets. Things get lost, and nobody has the full picture.
 
----
+**What this app does.** It puts all of that in one place, with a different view
+for each kind of person:
 
-## Table of Contents
+| If you are… | You can… |
+|---|---|
+| **A startup** | Apply to a program, see the status of your application, book sessions with your mentor, report progress, register for events |
+| **A mentor** | Set when you are available, see the startups assigned to you, run sessions, give feedback |
+| **An administrator** | Create programs, review applications, assign mentors to startups, schedule events, read reports |
 
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Installation & Setup](#installation--setup)
-  - [Prerequisites](#prerequisites)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-  - [Database Setup](#database-setup)
-- [Running the Application](#running-the-application)
-- [CI/CD Pipeline](#cicd-pipeline)
-- [API Documentation](#api-documentation)
-- [Project Management](#project-management)
-- [Contributors](#contributors)
+## How it works
 
----
+```mermaid
+flowchart LR
+    S[Startup applies<br/>to a program] --> A[Admin reviews<br/>the application]
+    A --> M[Admin assigns<br/>a mentor]
+    M --> X[Mentor and startup<br/>hold sessions]
+    X --> F[Feedback and<br/>progress reports]
+    F --> E[Events such as<br/>demo day]
+```
 
-## Features
+Each person signs in with their own account, and the app only shows them the
+screens their role is allowed to use.
 
-- **User Authentication & Role Management**  
-  Secure login and registration with JWT-based authentication, role-based access control (Admin, Mentor, Startup).
-  
-- **Startup Application Management**  
-  Startups can submit applications, track status, and receive evaluations.
+## Technology
 
-- **Mentor Assignment System**  
-  Assign mentors to startups based on expertise, industry, or program needs.
+| Layer | What is used |
+|---|---|
+| Backend | Node.js, Express, MongoDB (Mongoose), JWT sign-in, Joi request validation |
+| Frontend | React 18, React Router, Axios, Bootstrap and Tailwind CSS |
+| Testing | Mocha, Chai and Sinon (backend controllers and domain logic) |
+| Delivery | GitHub Actions on a self-hosted runner, PM2 process manager, AWS EC2 |
 
-- **Progress Tracking & Milestones**  
-  Monitor startup development through milestone-based reporting.
+### Design patterns
 
-- **Feedback System**  
-  Exchange structured feedback between mentors and startups.
+The backend was built to demonstrate object-oriented design patterns, and each
+one lives in its own folder so it is easy to find:
 
-- **Demo Day & Event Scheduling**  
-  Organize presentation events with automated scheduling and notifications.
+| Pattern | Where | What it is used for |
+|---|---|---|
+| Repository | `backend/repositories/` | Keeps database queries out of the controllers |
+| Factory | `backend/domain/factory/` | Creates the right kind of user, mentor or application object |
+| Strategy | `backend/domain/strategy/` | Swaps behaviour for different kinds of user and application |
+| Decorator | `backend/domain/decorators/` | Adds behaviour to an application without changing its class |
+| Proxy | `backend/middleware/roleProxy.js` | Checks a user's role before a request reaches the controller |
 
-- **Responsive & User-Friendly UI**  
-  Fully responsive frontend optimized for mobile and desktop.
-
----
-
-## Technology Stack
-
-### Backend
-
-- **Node.js** with **Express.js** for API handling
-- **MongoDB** for NoSQL data storage
-- **JWT Authentication** for secure sessions
-
-### Frontend
-
-- **React.js** with **React Router**
-- **CSS** (Responsive Design with Flexbox/Grid)
-
-### DevOps
-
-- **GitHub Actions** for CI/CD automation
-- **PM2** for production process management
-- **AWS EC2** for cloud hosting
-
----
-
-## Project Structure
+## Project structure
 
 ```plaintext
-startup-incubation-app/
-├── backend/                # Node.js + Express backend
-│   ├── config/             # Configuration files
-│   ├── controllers/        # Request handlers
-│   ├── middleware/         # Custom middleware
-│   ├── models/             # Database models
-│   ├── routes/             # API routes
-│   └── tests/              # Backend tests
-├── frontend/               # React frontend
-│   ├── public/             # Static files
-│   └── src/                # React components and logic
-│       ├── components/     # Reusable UI components
-│       ├── pages/          # Page components
-│       ├── context/        # React context providers
-│       ├── services/       # API service functions
-│       └── utils/          # Utility functions
-└── .github/                # GitHub workflow configurations
-    └── workflows/          # CI/CD workflow files
+simappA2/
+├── backend/
+│   ├── controllers/      # Request handlers (12 feature areas)
+│   ├── domain/           # Business objects, factories, strategies, decorators
+│   ├── repositories/     # Database access
+│   ├── models/           # Mongoose schemas
+│   ├── middleware/       # Sign-in check, role check, request validation
+│   ├── routes/           # API routes
+│   ├── APICollections/   # Postman collections for every feature and role
+│   └── test/             # Mocha tests
+├── frontend/
+│   └── src/              # React pages, components, context, services
+└── .github/workflows/    # CI pipeline
 ```
 
 ---
@@ -115,8 +96,8 @@ startup-incubation-app/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/bajuniverse/startupincubationapp.git
-   cd startupincubationapp
+   git clone https://github.com/bajundotdev/simappA2.git
+   cd simappA2
    ```
 
 2. Install backend dependencies:
@@ -127,7 +108,7 @@ startup-incubation-app/
 
 3. Create a `.env` file in the backend directory with the following variables:
    ```
-   PORT=5000
+   PORT=5001
    MONGO_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret_key
    NODE_ENV=development
@@ -143,7 +124,7 @@ startup-incubation-app/
 
 2. Create a `.env` file in the frontend directory (optional for custom configuration):
    ```
-   REACT_APP_API_URL=http://localhost:5000/api
+   REACT_APP_API_URL=http://localhost:5001/api
    ```
 
 ### Database Setup
@@ -185,69 +166,46 @@ startup-incubation-app/
    npm start
    ```
 
-3. The complete application will be served from `http://localhost:5000`
+3. The complete application will be served from `http://localhost:5001`
 
 
 ---
 
-## CI/CD Pipeline
-
-The project uses GitHub Actions for continuous integration and deployment. The workflow includes:
-
-1. Code checkout
-2. Environment setup
-3. Dependencies installation
-4. Running tests
-5. Building the frontend
-6. Deployment to AWS EC2
-
-Configuration: `.github/workflows/ci.yml`  
-Deployment uses **PM2** with commands:
+## Tests
 
 ```bash
-#backend 
-pm2 start "npm run start" --name="backend"
-
-# frontend
-pm2 serve build/ 3000 --name="frontend" --spa
+cd backend
+npm test
 ```
 
----
+## API overview
 
-## API Documentation
+All routes are under `/api`. The Postman collections in `backend/APICollections/`
+contain ready-made requests for each one, grouped by feature and by role.
 
-The backend API provides the following endpoints:
+| Area | Base path |
+|---|---|
+| Sign-in and registration | `/api/auth` |
+| User profile | `/api/user` |
+| Programs | `/api/programs` |
+| Applications | `/api/applications` |
+| Mentors | `/api/mentor` |
+| Mentor assignment | `/api/assignment` |
+| Mentor availability | `/api/availability` |
+| Sessions | `/api/sessions` |
+| Progress | `/api/progress` |
+| Feedback | `/api/feedback` |
+| Reports | `/api/reports` |
+| Events | `/api/events` |
 
-- **Authentication**
-  - `POST /api/auth/register` - Register a new user
-  - `POST /api/auth/login` - Login and get JWT token
+## Status
 
-- **Users**
-  - `GET /api/users/profile` - Get user profile
-  - `PUT /api/users/profile` - Update user profile
-
-- **Applications**
-  - `POST /api/applications` - Submit a new application
-  - `GET /api/applications` - Get all applications
-  - `GET /api/applications/:id` - Get application by ID
-  - `PUT /api/applications/:id` - Update application
-  - `DELETE /api/applications/:id` - Delete application
-
-- **Feedback**
-  - `POST /api/feedback` - Provide feedback
-  - `GET /api/feedback` - Get all feedback
-  - `PUT /api/feedback/:id` - Update feedback
-  - `DELETE /api/feedback/:id` - Delete feedback
-
----
-
-## Project Management
-
-Agile-managed via **Jira**  
-[Jira Board Link](https://connect-team-i9xogk3f.atlassian.net/jira/software/projects/SIM/boards/67)
-
----
+A university group project, built for the IFN636 unit at Queensland University
+of Technology in 2025. It is not maintained as a
+product and the original demo server is no longer advertised here.
 
 ## Contributors
 
-- [bajuniverse](https://github.com/bajuniverse)
+- [bajundotdev](https://github.com/bajundotdev)
+- [MKRCabanero](https://github.com/MKRCabanero)
+- [tomsecundo](https://github.com/tomsecundo)
